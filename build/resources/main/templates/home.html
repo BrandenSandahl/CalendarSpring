@@ -6,15 +6,40 @@
 </head>
 <body>
 
+{{^userName}}
+<form action="/login" method="post">
+    <input type="text" placeholder="User Name" name="userName">
+    <button type="submit">Log in</button>
+</form>
+{{/userName}}
+
+
+{{#userName}}
+<h1><span id="userName">{{.}}</span><span class="exclaim">!</span> Hello<span class="exclaim">!!</span></h1>
+<form action="/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
+
+
+
 <form action="/create-event" method="post">
     <input type="text" placeholder="Description" name="description" size="50"/>
     <input type="datetime-local" name="dateTime" value="{{now}}" />
     <button type="submit">Add Event</button>
 </form>
-
+{{/userName}}
+<p>
 {{#events}}
-{{description}} - {{dateTime}}<br />
-{{/events}}
+{{description}} - {{dateTime}}
+    {{/events}}
+{{#userName}}
+<form action="/fav" method="post" style="display:inline;">
+    <input type="hidden" value="{{#event}}{{id}}{{/event}}" />
+    <button type="submit">Favorite</button>
+</form>
+    <br />
+{{/userName}}
+</p>
 
 </body>
 </html>
