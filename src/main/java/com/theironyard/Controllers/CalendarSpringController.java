@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 /**
  * Created by branden on 3/14/16 at 10:18.
@@ -34,13 +36,19 @@ public class CalendarSpringController {
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public String home(Model model, HttpSession session) {
         String userName = (String) session.getAttribute("userName");
-
+        List<Event> eventEntities = eventRepository.findByOrderByDateTimeDesc();
         if (userName != null) {
-            model.addAttribute("now", LocalDateTime.now());
-            model.addAttribute("userName", userName);
-        }
-        model.addAttribute("events", eventRepository.findByOrderByDateTimeDesc());
+            User user = userRepository.findFirstByName(userName);
 
+            model.addAttribute("user", user);
+            model.addAttribute("now", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+
+            for (Event event : eventEntities) {
+                event.setShowFavButton(favRepository.findByUserAndEvent(user, event) == null);
+            }
+        }
+
+        model.addAttribute("events", eventEntities);
         return "home";
     }
 
